@@ -7,15 +7,20 @@
 //
 
 import UIKit
+import RealmSwift
 
 class WidgetViewController: UIViewController {
 
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var nameTextField: UITextField!
     
+    var selectedWidget: Widget!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        if let selectedWidget = selectedWidget {
+            self.nameTextField.text = selectedWidget.name
+        }
         // Do any additional setup after loading the view.
     }
 
@@ -35,9 +40,52 @@ class WidgetViewController: UIViewController {
     }
     */
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if saveButton === sender {
-            // Save Actions
+    override func shouldPerformSegueWithIdentifier(identifier: String?, sender: AnyObject?) -> Bool {
+        if validateFields() {
+            if let _ = selectedWidget {
+                updateWidget()
+            }
+            else {
+                addNewWidget()
+            }
+            return true
+        }
+        else {
+            return false
+        }
+        
+    }
+    
+    func addNewWidget() {
+        let realm = try! Realm()
+        
+        try! realm.write    {
+            let newWidget = Widget()
+            newWidget.name = self.nameTextField.text!
+            realm.add(newWidget)
+            self.selectedWidget = newWidget
+        }
+    }
+    
+    func updateWidget() {
+        let realm = try! Realm()
+        try! realm.write {
+            self.selectedWidget.name = self.nameTextField.text!
+        }
+    }
+    
+    func validateFields() -> Bool {
+        if(nameTextField.text == "")    {
+            let alertController = UIAlertController(title: "Error", message: "Please enter a name", preferredStyle: .Alert)
+            let alertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive) { alert in
+                alertController.dismissViewControllerAnimated(true, completion: nil)
+            }
+            alertController.addAction(alertAction)
+            presentViewController(alertController, animated: true, completion: nil)
+            return false
+        }
+        else {
+            return true
         }
     }
     
@@ -46,6 +94,14 @@ class WidgetViewController: UIViewController {
     @IBAction func cancelButton(sender: UIBarButtonItem) {
         self.dismissViewControllerAnimated(true, completion: nil)
         navigationController!.popViewControllerAnimated(true)
+    }
+    
+    @IBAction func unwindFromWidgets(segue: UIStoryboardSegue) {
+        if segue.identifier == "ShowDetail" {
+            let widgetsController = segue.sourceViewController as! WidgetTableViewController
+            selectedWidget = widgetsController.selectedWidget
+            nameTextField.text = selectedWidget.name
+        }
     }
     
 

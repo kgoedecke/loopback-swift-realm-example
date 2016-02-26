@@ -7,120 +7,104 @@
 //
 
 import UIKit
+import RealmSwift
 
 class WidgetTableViewController: UITableViewController {
 
+    let realm = try! Realm()
+    lazy var widgets: Results<Widget> = { self.realm.objects(Widget) }()
+    var selectedWidget: Widget!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.leftBarButtonItem = editButtonItem()
+        
+        // Load Dummy Widgets
+        populateDummyWidgets()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        return widgets.count
     }
 
-    /*
+    
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCellWithIdentifier("widgetCell", forIndexPath: indexPath) as! WidgetTableViewCell
 
-        // Configure the cell...
-
+        let widget = widgets[indexPath.row]
+        cell.nameLabel.text = widget.name
         return cell
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    
+    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath {
+        selectedWidget = widgets[indexPath.row]
+        return indexPath
     }
-    */
-
-    /*
-    // Override to support editing the table view.
+    
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            // Delete is currently not supported in offline mode
+            //let selectedWidget = widgets[indexPath.row]
+            //try! realm.write {
+            //    realm.delete(selectedWidget)
+            //}
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            let alertController = UIAlertController(title: "Error", message: "Delete is not supported while you're offline", preferredStyle: .Alert)
+            let alertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive) { alert in
+                alertController.dismissViewControllerAnimated(true, completion: nil)
+            }
+            alertController.addAction(alertAction)
+            presentViewController(alertController, animated: true, completion: nil)
+        }
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
+    
+    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         return true
     }
-    */
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
     // MARK: - Edit and Add Widget Segue operations
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "ShowDetail" {
             let widgetDetailViewController = segue.destinationViewController as! WidgetViewController
-//            if let selectedWidgetCell = sender as? WidgetTableViewCell {
-//                let indexPath = tableView.indexPathForCell(selectedWidgetCell)!
-//                let selectedWidget = widgetsLocal[indexPath.row]
-//                widgetDetailViewController.widget = selectedWidget
-//            }
+            if let selectedWidgetCell = sender as? WidgetTableViewCell {
+                let indexPath = tableView.indexPathForCell(selectedWidgetCell)!
+                let selectedWidget = widgets[indexPath.row]
+                widgetDetailViewController.selectedWidget = selectedWidget
+            }
         }
-        else if segue.identifier == "AddItem" {
+        else if segue.identifier == "AddWidget" {
             NSLog("Adding new widget")
         }
         
     }
     
     @IBAction func unwindToWidgetList(sender: UIStoryboardSegue) {
-        NSLog("Say what")
-        //if let sourceViewController = sender.sourceViewController as? WidgetViewController, widget = sourceViewController.widget {
-        if let sourceViewController = sender.sourceViewController as? WidgetViewController  {
-            if let selectedIndexPath = tableView.indexPathForSelectedRow {
-                tableView.reloadRowsAtIndexPaths([selectedIndexPath], withRowAnimation: .None)
+        self.tableView.reloadData()
+    }
+    
+    func populateDummyWidgets() {
+        if widgets.count == 0   {
+            try! realm.write() {
+                let defaultWidgets = ["Foo", "Bar"]
+                for widget in defaultWidgets    {
+                    let newWidget = Widget()
+                    newWidget.name = widget
+                    self.realm.add(newWidget)
+                }
             }
-            else    {
-//                let newIndexPath = NSIndexPath(forRow: widgetsLocal.count, inSection: 0)
-//                self.widgetsLocal.append(widget)
-//                self.tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
-            }
+            widgets = realm.objects(Widget)
         }
     }
 

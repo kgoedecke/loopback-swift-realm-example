@@ -23,7 +23,7 @@
             </objects>
             <point key="canvasLocation" x="0.0" y="0.0"/>
         </scene>
-        <!--Root View Controller-->
+        <!--Widgets-->
         <scene sceneID="u4v-gx-1hv">
             <objects>
                 <tableViewController id="Q7t-FI-Rf7" customClass="WidgetTableViewController" customModule="loopback_swift_realm_example" customModuleProvider="target" sceneMemberID="viewController">
@@ -32,7 +32,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="7MG-dG-DiB">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="widgetCell" id="7MG-dG-DiB" customClass="WidgetTableViewCell" customModule="loopback_swift_realm_example" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="92" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7MG-dG-DiB" id="RWc-va-Ctx">
@@ -40,7 +40,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xQz-IA-VBX">
-                                            <rect key="frame" x="8" y="11" width="42" height="21"/>
+                                            <rect key="frame" x="21" y="11" width="525" height="21"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
@@ -48,6 +48,7 @@
                                     </subviews>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="nameLabel" destination="xQz-IA-VBX" id="XVR-tl-ULy"/>
                                     <segue destination="0Fx-4m-ZeG" kind="show" identifier="ShowDetail" id="rf7-zS-ZRS"/>
                                 </connections>
                             </tableViewCell>
@@ -57,10 +58,10 @@
                             <outlet property="delegate" destination="Q7t-FI-Rf7" id="pON-2l-cw3"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="c8Z-sZ-P97">
+                    <navigationItem key="navigationItem" title="Widgets" id="c8Z-sZ-P97">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="8rW-Pi-UXY">
                             <connections>
-                                <segue destination="m9m-u9-LaU" kind="presentation" id="sSx-bb-Xvk"/>
+                                <segue destination="m9m-u9-LaU" kind="presentation" identifier="AddWidget" id="sSx-bb-Xvk"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -87,13 +88,17 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="JjD-mI-i6r">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="JjD-mI-i6r">
                                 <rect key="frame" x="20" y="101" width="560" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="JjD-mI-i6r" firstAttribute="centerX" secondItem="g0b-fL-6aJ" secondAttribute="centerX" id="YIg-qr-bcM"/>
+                            <constraint firstItem="JjD-mI-i6r" firstAttribute="width" secondItem="g0b-fL-6aJ" secondAttribute="width" constant="-40" id="kcd-H6-aY7"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="pB9-q0-aS8">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="jPL-Xx-q8U">
@@ -117,11 +122,11 @@
             </objects>
             <point key="canvasLocation" x="2962" y="0.0"/>
         </scene>
-        <!--Item-->
+        <!--Widgets-->
         <scene sceneID="rS8-e2-zfS">
             <objects>
                 <navigationController id="vKu-nP-Er8" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="NXg-7U-UBQ"/>
+                    <tabBarItem key="tabBarItem" title="Widgets" image="first" id="NXg-7U-UBQ"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="1gb-2r-pCk">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -153,6 +158,9 @@
             <point key="canvasLocation" x="2231" y="476"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="first" width="30" height="30"/>
+    </resources>
     <inferredMetricsTieBreakers>
         <segue reference="rf7-zS-ZRS"/>
     </inferredMetricsTieBreakers>
