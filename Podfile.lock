@@ -1,0 +1,27 @@
+PODS:
+  - LoopBack (1.3.0)
+  - Realm (0.98.2):
+    - Realm/Headers (= 0.98.2)
+  - Realm/Headers (0.98.2)
+  - RealmSwift (0.98.2):
+    - Realm (= 0.98.2)
+
+DEPENDENCIES:
+  - LoopBack (from `https://github.com/strongloop/loopback-sdk-ios.git`)
+  - RealmSwift
+
+EXTERNAL SOURCES:
+  LoopBack:
+    :git: https://github.com/strongloop/loopback-sdk-ios.git
+
+CHECKOUT OPTIONS:
+  LoopBack:
+    :commit: 27fe094e3a03720b090aeb48ae04361895883196
+    :git: https://github.com/strongloop/loopback-sdk-ios.git
+
+SPEC CHECKSUMS:
+  LoopBack: 0ae752b0c1d3f572e1d949945a7651f61c433f9e
+  Realm: 88a147fe04b8f07191a676b15c779b2b448991de
+  RealmSwift: 9907c7415b3e19ef2ab9f89878fc890f03f93aea
+
+COCOAPODS: 0.39.0

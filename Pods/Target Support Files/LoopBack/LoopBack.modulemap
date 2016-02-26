@@ -1,0 +1,6 @@
+framework module LoopBack {
+  umbrella header "LoopBack-umbrella.h"
+
+  export *
+  module * { export * }
+}
