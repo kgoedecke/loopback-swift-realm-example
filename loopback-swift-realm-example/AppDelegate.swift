@@ -7,14 +7,44 @@
 //
 
 import UIKit
+import LoopBack
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    static let adapter = LBRESTAdapter(URL: NSURL(string: "http://localhost:3000"))
+    static let widgetRepository = adapter.repositoryWithClass(WidgetRemoteRepository) as! WidgetRemoteRepository
+    
+    static func syncAllWithRemote() {
+        let realm = try! Realm()
+        // Sync offline changes
+        let widgets = realm.objects(Widget)
+        for widget in widgets {
+            widget.syncWithRemote()
+        }
+        // Get all widgets from remote that don't exist locally
+        AppDelegate.widgetRepository.allWithSuccess({ (models: [AnyObject]!) -> Void in
+            let widgets = models as! [WidgetRemote]
+            for widget in widgets {
+                let predicate = NSPredicate(format: "remoteId == %d", widget._id as! Int)
+                let localWidget = realm.objects(Widget).filter(predicate)
+                if (localWidget.count == 0) {
+                    try! realm.write    {
+                        let newWidget = Widget(remoteWidget: widget)
+                        realm.add(newWidget)
+                    }
+                }
+            }
+            }) { (err: NSError!) -> Void in
+                NSLog(err.description)
+        }
 
+    }
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        
+        AppDelegate.syncAllWithRemote()
         return true
     }
 

@@ -21,12 +21,10 @@ class WidgetViewController: UIViewController {
         if let selectedWidget = selectedWidget {
             self.nameTextField.text = selectedWidget.name
         }
-        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
 
@@ -57,20 +55,38 @@ class WidgetViewController: UIViewController {
     }
     
     func addNewWidget() {
-        let realm = try! Realm()
         
-        try! realm.write    {
-            let newWidget = Widget()
-            newWidget.name = self.nameTextField.text!
-            realm.add(newWidget)
-            self.selectedWidget = newWidget
-        }
+        let widgetRemote = AppDelegate.widgetRepository.modelWithDictionary(nil) as! WidgetRemote
+        widgetRemote.name = self.nameTextField.text!
+        widgetRemote.updated = NSDate()
+        widgetRemote.saveWithSuccess({ () -> Void in
+            // Add Local Object with remote_id
+            let realm = try! Realm()
+            try! realm.write    {
+                let newWidget = Widget(remoteWidget: widgetRemote)
+                realm.add(newWidget)
+                self.selectedWidget = newWidget
+            }
+            }, failure: { (error: NSError!) -> Void in
+                NSLog(error.description)
+                // Save with no remote_id
+                let realm = try! Realm()
+                try! realm.write    {
+                    let newWidget = Widget()
+                    newWidget.name = self.nameTextField.text!
+                    realm.add(newWidget)
+                    self.selectedWidget = newWidget
+                }
+        })
+
     }
     
     func updateWidget() {
         let realm = try! Realm()
         try! realm.write {
             self.selectedWidget.name = self.nameTextField.text!
+            self.selectedWidget.updated = NSDate()
+            self.selectedWidget.syncWithRemote()
         }
     }
     

@@ -15,12 +15,19 @@ class WidgetTableViewController: UITableViewController {
     lazy var widgets: Results<Widget> = { self.realm.objects(Widget) }()
     var selectedWidget: Widget!
     
+    var notificationToken: NotificationToken?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.leftBarButtonItem = editButtonItem()
         
         // Load Dummy Widgets
         populateDummyWidgets()
+        
+        // Set realm notification block to refresh table
+        notificationToken = realm.addNotificationBlock { [unowned self] note, realm in
+            self.tableView.reloadData()
+        }
 
     }
 
@@ -59,7 +66,7 @@ class WidgetTableViewController: UITableViewController {
             //try! realm.write {
             //    realm.delete(selectedWidget)
             //}
-            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             let alertController = UIAlertController(title: "Error", message: "Delete is not supported while you're offline", preferredStyle: .Alert)
             let alertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive) { alert in
                 alertController.dismissViewControllerAnimated(true, completion: nil)
@@ -91,7 +98,7 @@ class WidgetTableViewController: UITableViewController {
     }
     
     @IBAction func unwindToWidgetList(sender: UIStoryboardSegue) {
-        self.tableView.reloadData()
+        // Reload is triggered by Realm Notification
     }
     
     func populateDummyWidgets() {
