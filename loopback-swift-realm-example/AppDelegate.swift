@@ -19,12 +19,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     static func syncAllWithRemote() {
         let realm = try! Realm()
-        // Sync offline changes
-        let widgets = realm.objects(Widget)
+        // Sort descending to remove potentially expired local widgets
+        // that got removed from the backend before assigning new ids (avoids id conflicts)
+        let widgets = realm.objects(Widget).sorted("remoteId", ascending: false)
         for widget in widgets {
             widget.syncWithRemote()
         }
-        // Get all widgets from remote that don't exist locally
+        // Get new widgets from remote
         AppDelegate.widgetRepository.allWithSuccess({ (models: [AnyObject]!) -> Void in
             let widgets = models as! [WidgetRemote]
             for widget in widgets {
