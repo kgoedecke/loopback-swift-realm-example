@@ -23,7 +23,7 @@
             </objects>
             <point key="canvasLocation" x="0.0" y="0.0"/>
         </scene>
-        <!--Widgets-->
+        <!--👾 Widgets-->
         <scene sceneID="u4v-gx-1hv">
             <objects>
                 <tableViewController id="Q7t-FI-Rf7" customClass="WidgetTableViewController" customModule="loopback_swift_realm_example" customModuleProvider="target" sceneMemberID="viewController">
@@ -58,13 +58,36 @@
                             <outlet property="delegate" destination="Q7t-FI-Rf7" id="pON-2l-cw3"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Widgets" id="c8Z-sZ-P97">
+                    <navigationItem key="navigationItem" title="👾 Widgets" id="c8Z-sZ-P97">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="8rW-Pi-UXY">
                             <connections>
                                 <segue destination="m9m-u9-LaU" kind="presentation" identifier="AddWidget" id="sSx-bb-Xvk"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="s1P-RK-KTE">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <attributedString key="attributedTitle">
+                            <fragment content="⚡️">
+                                <attributes>
+                                    <font key="NSFont" size="11" name="AppleColorEmoji"/>
+                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                </attributes>
+                            </fragment>
+                            <fragment content=" ">
+                                <attributes>
+                                    <font key="NSFont" size="11" name="HelveticaNeue"/>
+                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                </attributes>
+                            </fragment>
+                            <fragment content="Syncing...">
+                                <attributes>
+                                    <font key="NSFont" metaFont="smallSystem"/>
+                                    <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                </attributes>
+                            </fragment>
+                        </attributedString>
+                    </refreshControl>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="icr-OO-qT1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

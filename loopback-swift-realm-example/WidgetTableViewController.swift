@@ -28,7 +28,15 @@ class WidgetTableViewController: UITableViewController {
         notificationToken = realm.addNotificationBlock { [unowned self] note, realm in
             self.tableView.reloadData()
         }
+        
+        self.refreshControl?.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
 
+    }
+    
+    func refresh(sender:AnyObject)
+    {
+        AppDelegate.syncAllWithRemote()
+        self.refreshControl?.endRefreshing()
     }
 
     override func didReceiveMemoryWarning() {
