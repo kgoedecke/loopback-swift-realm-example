@@ -66,7 +66,7 @@ class Widget: Object {
                 }
                 }, failure: { (err: NSError!) -> Void in
                     // If object was deleted on Remote (error -1011), then delete locally
-                    if (err.code == -1011) {
+                    if (err.code == NSURLErrorBadServerResponse) {
                         NSLog("Remote widget not found, deleting local widget")
                         try! self.realm!.write {
                             self.realm!.delete(self)
