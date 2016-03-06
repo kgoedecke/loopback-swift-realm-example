@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import LoopBack
 
 class WidgetTableViewController: UITableViewController {
 
@@ -69,19 +70,39 @@ class WidgetTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete is currently not supported in offline mode
-            //let selectedWidget = widgets[indexPath.row]
-            //try! realm.write {
-            //    realm.delete(selectedWidget)
-            //}
-            //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            let alertController = UIAlertController(title: "Error", message: "Delete is not supported while you're offline", preferredStyle: .Alert)
-            let alertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive) { alert in
-                alertController.dismissViewControllerAnimated(true, completion: nil)
+            selectedWidget = widgets[indexPath.row]
+            if (selectedWidget.remoteId.value != nil) {
+                AppDelegate.widgetRepository.findById(widgets[indexPath.row].remoteId.value, success: { (model: LBPersistedModel!) -> Void in
+                    model.destroyWithSuccess({ () -> Void in
+                        try! self.realm.write {
+                            self.realm.delete(self.widgets[indexPath.row])
+                        }
+                        }, failure: { (err: NSError!) -> Void in
+                            
+                    })
+                    }, failure: { (err: NSError!) -> Void in
+                        if (err.code == NSURLErrorCannotConnectToHost) {
+                            NSLog("Can not connect to Host")
+                            let alertController = UIAlertController(title: "Error", message: "Delete is not supported while you're offline", preferredStyle: .Alert)
+                            let alertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive) { alert in
+                                alertController.dismissViewControllerAnimated(true, completion: nil)
+                            }
+                            alertController.addAction(alertAction)
+                            self.presentViewController(alertController, animated: true, completion: nil)
+                        }
+                })
             }
-            alertController.addAction(alertAction)
-            presentViewController(alertController, animated: true, completion: nil)
+            else {
+                NSLog("Attempt to delete local widget that has never been synced")
+                let alertController = UIAlertController(title: "Error", message: "An Error occured please refresh and try again", preferredStyle: .Alert)
+                let alertAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive) { alert in
+                    alertController.dismissViewControllerAnimated(true, completion: nil)
+                }
+                alertController.addAction(alertAction)
+                self.presentViewController(alertController, animated: true, completion: nil)
+            }
         }
+        
     }
     
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
