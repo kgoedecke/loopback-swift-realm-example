@@ -6,7 +6,6 @@
 //  Copyright © 2016 kevingoedecke. All rights reserved.
 //
 
-import Foundation
 import LoopBack
 
 class WidgetRemote : LBPersistedModel {
