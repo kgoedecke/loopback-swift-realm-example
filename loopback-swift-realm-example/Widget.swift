@@ -6,7 +6,6 @@
 //  Copyright © 2016 kevingoedecke. All rights reserved.
 //
 
-import Foundation
 import RealmSwift
 import LoopBack
 
@@ -73,6 +72,32 @@ class Widget: Object {
                         }
                     }
             })
+        }
+    }
+
+    static func syncAllWithRemote() {
+        let realm = try! Realm()
+        // Sort descending to remove potentially expired local widgets
+        // that got removed from the backend before assigning new ids (avoids id conflicts)
+        let widgets = realm.objects(Widget).sorted("remoteId", ascending: false)
+        for widget in widgets {
+            widget.syncWithRemote()
+        }
+        // Get new widgets from remote
+        AppDelegate.widgetRepository.allWithSuccess({ (models: [AnyObject]!) -> Void in
+            let widgets = models as! [WidgetRemote]
+            for widget in widgets {
+                let predicate = NSPredicate(format: "remoteId == %d", widget._id as! Int)
+                let localWidget = realm.objects(Widget).filter(predicate)
+                if (localWidget.count == 0) {
+                    try! realm.write    {
+                        let newWidget = Widget(remoteWidget: widget)
+                        realm.add(newWidget)
+                    }
+                }
+            }
+            }) { (err: NSError!) -> Void in
+                NSLog(err.description)
         }
     }
 }

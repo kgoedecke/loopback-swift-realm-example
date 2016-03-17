@@ -17,35 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static let adapter = LBRESTAdapter(URL: NSURL(string: "http://localhost:3000"))
     static let widgetRepository = adapter.repositoryWithClass(WidgetRemoteRepository) as! WidgetRemoteRepository
     
-    static func syncAllWithRemote() {
-        let realm = try! Realm()
-        // Sort descending to remove potentially expired local widgets
-        // that got removed from the backend before assigning new ids (avoids id conflicts)
-        let widgets = realm.objects(Widget).sorted("remoteId", ascending: false)
-        for widget in widgets {
-            widget.syncWithRemote()
-        }
-        // Get new widgets from remote
-        AppDelegate.widgetRepository.allWithSuccess({ (models: [AnyObject]!) -> Void in
-            let widgets = models as! [WidgetRemote]
-            for widget in widgets {
-                let predicate = NSPredicate(format: "remoteId == %d", widget._id as! Int)
-                let localWidget = realm.objects(Widget).filter(predicate)
-                if (localWidget.count == 0) {
-                    try! realm.write    {
-                        let newWidget = Widget(remoteWidget: widget)
-                        realm.add(newWidget)
-                    }
-                }
-            }
-            }) { (err: NSError!) -> Void in
-                NSLog(err.description)
-        }
-
-    }
-    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        AppDelegate.syncAllWithRemote()
+        Widget.syncAllWithRemote()
         return true
     }
 

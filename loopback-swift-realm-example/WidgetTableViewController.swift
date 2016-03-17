@@ -36,7 +36,7 @@ class WidgetTableViewController: UITableViewController {
     
     func refresh(sender:AnyObject)
     {
-        AppDelegate.syncAllWithRemote()
+        Widget.syncAllWithRemote()
         self.refreshControl?.endRefreshing()
     }
 
